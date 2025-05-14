@@ -1,0 +1,516 @@
+/* 폰트 정의 */
+@font-face {
+    font-family: 'Suisse Int\'l Mono';
+    src: url('fonts/SuisseIntlMono-Regular-WebS.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Suisse Int\'l Mono';
+    src: url('fonts/SuisseIntlMono-Bold-WebS.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Suisse Int\'l Mono';
+    src: url('fonts/SuisseIntlMono-Thin-WebS.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: '지백';
+    src: url('fonts/jibaek.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+}
+.en {
+    line-height: 1.2;
+}
+.project-description.en
+{
+    line-height: 1.2;
+}
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.header-content {
+    text-align: center;
+    z-index: 2;
+}
+
+h1 {
+    font-family: '지백', serif;
+    font-size: 5rem;
+    font-weight: normal;
+    color: #000;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.header-description {
+    font-family: 'Suisse Int\'l Mono', monospace;
+    font-size: 1.2rem;
+    color: #000;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.header-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.1;
+    z-index: 1;
+}
+
+/* 프로젝트 설명 스타일 */
+.project-description {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    font-family: 'Suisse Int\'l Mono', monospace;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #333;
+}
+
+.project-description p {
+    margin-bottom: 2rem;
+}
+
+.project-description p:last-child {
+    margin-bottom: 0;
+}
+
+/* 카드 스타일 */
+#content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 인쇄용 2단 고정 */
+    gap: 2.5rem 2rem;
+    padding: 2rem 1rem;
+    background: #fff;
+}
+
+.card {
+    border-radius: 0;
+    border: 1px solid #000;
+    background: #fff;
+    box-shadow: none;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+    page-break-inside: avoid;
+    margin-bottom: 0;
+}
+
+.card-image {
+    width: 100%;
+    height: 320px;
+    background: #fff;
+    border-bottom: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.card-image img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    border-radius: 0;
+    background: #fff;
+    box-shadow: none;
+}
+
+.card-content {
+    padding: 1.2rem 1.5rem 1.5rem 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background: #fff;
+}
+
+.card-label {
+    font-family: 'Suisse Int\'l Mono', monospace;
+    font-size: 0.95rem;
+    color: #222;
+    font-weight: bold;
+    margin-top: 0.7rem;
+    margin-bottom: 0.1rem;
+    letter-spacing: 0.01em;
+}
+
+.card-value {
+    font-family: '지백', sans-serif;
+    font-size: 1.05rem;
+    color: #111;
+    margin-bottom: 0.5rem;
+    word-break: break-all;
+}
+
+.card-content .card-label:first-child {
+    margin-top: 0.2rem;
+}
+
+.card-content .card-label:last-child {
+    margin-bottom: 0.2rem;
+}
+
+.card-content .card-value:last-child {
+    margin-bottom: 0;
+}
+
+.card h2 {
+    font-family: '지백', serif;
+    color: #000;
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: normal;
+}
+
+.card p {
+    color: #333;
+    margin-bottom: 0.3rem;
+    font-size: 1rem;
+}
+
+.card a {
+    color: #000;
+    text-decoration: underline;
+    word-break: break-all;
+    font-size: 1rem;
+}
+
+.card-number {
+    font-family: 'Suisse Int\'l Mono', monospace;
+    font-size: 1.1rem;
+    color: #888;
+    text-align: right;
+    margin-bottom: 0.5rem;
+}
+
+@media print {
+    body, html {
+        background: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    #content {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 2.5rem 2rem !important;
+        padding: 0.5cm 0.5cm !important;
+        background: #fff !important;
+    }
+    .card {
+        border: 1px solid #000 !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+        min-height: 600px;
+    }
+    .card-image {
+        height: 320px !important;
+        border-bottom: 1px solid #000 !important;
+        background: #fff !important;
+    }
+    .card-image img {
+        width: 90% !important;
+        height: 90% !important;
+        object-fit: contain !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+    .card-content {
+        padding: 1.2rem 1.5rem 1.5rem 1.5rem !important;
+        background: #fff !important;
+    }
+    .card-label {
+        font-size: 0.95rem !important;
+        color: #222 !important;
+        font-weight: bold !important;
+    }
+    .card-value {
+        font-size: 1.05rem !important;
+        color: #111 !important;
+    }
+    .card-number {
+        font-size: 1.1rem !important;
+        color: #888 !important;
+    }
+    .card h2, .card p, .card a {
+        color: #000 !important;
+        font-size: 1rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 3rem;
+    }
+    
+    .header-description {
+        font-size: 1rem;
+    }
+    
+    .project-description {
+        padding: 2rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    #content {
+        grid-template-columns: 1fr;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+}
+
+/* --- COVER 표지 레이아웃 정교화 --- */
+.cover {
+    width: 85vh;
+    height: 85vh;
+    margin: 0 auto;
+    position: relative;
+    display: grid;
+    grid-template-rows: 22% 38% 1fr 22%;
+    padding: 3vh 3vh 2vh 3vh;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+.cover-block {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.5vh;
+}
+
+/* 상단 블록: 좌측 정렬, 자간 넓게 */
+.cover-block.top {
+    align-items: flex-start;
+    text-align: left;
+    letter-spacing: 0.01em;
+    margin-bottom: 0;
+}
+.cover-block.top .mono {
+    font-size: 5.2vh;
+    letter-spacing: 0.04em;
+    font-weight: 400;
+}
+.cover-block.top .clock {
+    font-size: 5.2vh;
+    letter-spacing: -1em;
+    word-spacing: -1em;
+    font-weight: 400;
+}
+
+/* 중간 블록: 좌측 정렬, 행마다 줄바꿈 */
+.cover-block.middle {
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.2vh;
+}
+.cover-block.middle .mono {
+    font-size: 5.2vh;
+    letter-spacing: 0.01em;
+    font-weight: 400;
+    line-height: 1.05;
+}
+
+/* 하단 블록: 첫 줄 한글 중앙, 나머지 좌측 */
+.cover-block.bottom {
+    gap: 0.2vh;
+}
+.cover-block.bottom .korean {
+    text-align: center;
+    width: 100%;
+    font-size: 5.2vh;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    margin-bottom: 0.5vh;
+}
+.cover-block.bottom .mono {
+    text-align: left;
+    font-size: 5.2vh;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+.cover-block.bottom .number {
+    font-size: 5.2vh;
+    font-family: 'Suisse Int\'l Mono', monospace;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    margin-right: 1vw;
+}
+
+/* 숫자 0이 왼쪽에 붙도록 */
+.cover-block.bottom {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+.cover-block.bottom > * {
+    margin-right: 1vw;
+}
+.cover-block.bottom > *:last-child {
+    margin-right: 0;
+}
+
+/* 반응형 개선 */
+@media (max-width: 768px) {
+    .cover {
+        width: 97vw;
+        height: 97vw;
+        padding: 2vw;
+        grid-template-rows: 22% 38% 1fr 22%;
+    }
+    .cover-block.top .mono,
+    .cover-block.top .clock,
+    .cover-block.middle .mono,
+    .cover-block.bottom .korean,
+    .cover-block.bottom .mono,
+    .cover-block.bottom .number {
+        font-size: 4vw;
+    }
+}
+
+/* 텍스트 스타일링 */
+.mono {
+    font-family: 'Suisse Int\'l Mono', monospace;
+    font-size: 5vh;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.korean {
+    font-family: '지백', sans-serif;
+    font-size: 5vh;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+/* 시간 표시 부분 특별 스타일 */
+.clock {
+    font-size: 5vh;
+    letter-spacing: -.1em;
+    word-spacing: -0.1em;
+}
+span {
+    display: inline-block;
+}
+.flex2 {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.leftalign {
+    text-align: left;
+}
+/* 숫자 표시 부분 */
+.number {
+    display: inline-block;
+    width: 3.5em;  /* 숫자 3자리 + 여백 */
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .cover {
+        width: 95vw;
+        height: 95vw;
+        padding: 4vw;
+    }
+
+    .mono, .korean, .clock {
+        font-size: 4vw;
+    }
+
+    .cover-block:first-child {
+        margin-bottom: 10vw;
+    }
+
+    .cover-block:nth-child(2) {
+        margin-bottom: 10vw;
+    }
+}
+
+.project-description-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3vw;
+    max-width: 1200px;
+    margin: 0 auto 3rem auto;
+    padding: 4rem 2rem;
+}
+.project-description.en {
+    font-family: 'Suisse Int\'l Mono', monospace;
+    font-size: 1rem;
+    line-height: 1.4;
+    color:black;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+}
+.project-description.ko {
+    font-family: '지백', sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: black;
+}
+@media (max-width: 900px) {
+    .project-description-columns {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem 1rem;
+    }
+    .project-description.en, .project-description.ko {
+        font-size: 0.95rem;
+    }
+} 
