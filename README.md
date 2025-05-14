@@ -24,4 +24,4 @@ python -m http.server 8000
 
 - HTML5
 - CSS3
-- JavaScript (바닐라) 
+- JavaScript (바닐라)
