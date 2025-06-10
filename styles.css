@@ -1,6 +1,6 @@
 /* 폰트 정의 */
 @font-face {
-    font-family: 'Suisse Int\'l Mono';
+    font-family: 'SuisseIntlMono';
     src: url('fonts/SuisseIntlMono-Regular-WebS.woff') format('woff');
     font-weight: normal;
     font-style: normal;
@@ -8,7 +8,7 @@
 }
 
 @font-face {
-    font-family: 'Suisse Int\'l Mono';
+    font-family: 'SuisseIntlMono';
     src: url('fonts/SuisseIntlMono-Bold-WebS.woff') format('woff');
     font-weight: bold;
     font-style: normal;
@@ -16,7 +16,7 @@
 }
 
 @font-face {
-    font-family: 'Suisse Int\'l Mono';
+    font-family: 'SuisseIntlMono';
     src: url('fonts/SuisseIntlMono-Thin-WebS.woff') format('woff');
     font-weight: 100;
     font-style: normal;
@@ -44,15 +44,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #fff;
+    /* background-color: #fff; */
 }
-.en {
-    line-height: 1.2;
+
+#main-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
 }
-.project-description.en
-{
-    line-height: 1.2;
-}
+
 .container {
     width: 100%;
     max-width: 1200px;
@@ -60,15 +60,12 @@ body {
 }
 
 header {
-    position: relative;
-    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 2rem;
-    overflow: hidden;
-    background-color: #fff;
+    /* background-color: #fff; */
 }
 
 .header-content {
@@ -86,7 +83,7 @@ h1 {
 }
 
 .header-description {
-    font-family: 'Suisse Int\'l Mono', monospace;
+    font-family: 'SuisseIntlMono', monospace;
     font-size: 1.2rem;
     color: #000;
     max-width: 600px;
@@ -110,7 +107,7 @@ h1 {
     max-width: 800px;
     margin: 0 auto;
     padding: 4rem 2rem;
-    font-family: 'Suisse Int\'l Mono', monospace;
+    font-family: 'SuisseIntlMono', monospace;
     font-size: 1rem;
     line-height: 1.8;
     color: #333;
@@ -126,58 +123,188 @@ h1 {
 
 /* 카드 스타일 */
 #content {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 인쇄용 2단 고정 */
-    gap: 2.5rem 2rem;
-    padding: 2rem 1rem;
-    background: #fff;
+    position: relative;
+    width: 100%;
+    height: 85vh; /* 화면의 85% 높이를 가진 프레임 */
+    overflow: hidden;
+    border: 1px solid #ccc;
+    margin: 2rem 0;
+    cursor: grab;
+}
+
+#scene {
+    position: relative;
+    /* 크기는 script.js에서 동적으로 설정됩니다 */
+    background-color: #f8f9fa;
+    background-image:
+        linear-gradient(to right, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
 }
 
 .card {
-    border-radius: 0;
-    border: 1px solid #000;
-    background: #fff;
-    box-shadow: none;
-    overflow: visible;
-    display: flex;
-    flex-direction: column;
-    min-height: 600px;
-    page-break-inside: avoid;
-    margin-bottom: 0;
+    position: absolute; /* 절대 좌표로 배치 */
+    width: 240px;
+    height: 240px;
+    perspective: 1000px; 
+    background-color: transparent; 
+    border-radius: 50%; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    /* margin: auto; 제거 */
 }
 
-.card-image {
+.card-inner {
+    position: relative;
     width: 100%;
-    height: 320px;
-    background: #fff;
-    border-bottom: 1px solid #000;
+    height: 100%;
+    transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+    border-radius: 50%;
+}
+
+.card:hover .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 50%; 
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.card-front {
+    /* script.js에서 카테고리별 배경색이 인라인 스타일로 적용됨 */
+    /* 예: background-color: rgb(255, 238, 173); */
+    z-index: 2;
+    border: 1px solid rgba(0,0,0,0.1); /* 앞면 테두리 */
+}
+
+.card-image { 
+    width: 100%; 
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0;
-    margin-bottom: 0;
+    background-color: transparent; 
+    border-radius: 50%;
+    padding: 20px; 
+    box-sizing: border-box;
+    overflow: hidden; /* 확대된 이미지가 넘치지 않도록 설정 */
 }
 
 .card-image img {
-    width: 90%;
-    height: 90%;
-    object-fit: contain;
-    border-radius: 0;
-    background: #fff;
-    box-shadow: none;
+    /* max-width 와 max-height는 scale과 함께 사용 시 의도치 않은 결과를 줄 수 있어 주석 처리 또는 삭제 고려 */
+    /* max-width: 100%; */ 
+    /* max-height: 100%; */ 
+    object-fit: cover; 
+    width: 100%; 
+    height: 100%; 
+    mix-blend-mode: luminosity; 
+    opacity: 0.35; 
+    filter: grayscale(100%) contrast(50%) brightness(160%); 
+    transform: scale(1.2); /* 이미지를 10% 확대 */
+    transition: transform 0.3s ease; /* 부드러운 효과를 위해 (선택 사항) */
 }
 
-.card-content {
-    padding: 1.2rem 1.5rem 1.5rem 1.5rem;
-    flex-grow: 1;
+.card-back {
+    background-color: #ffffff; 
+    color: #111111; 
+    transform: rotateY(180deg);
+    z-index: 1;
+    padding: 30px; 
+    border: 1px solid #cccccc; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: stretch; /* .card-content가 width:100%를 갖도록 stretch로 변경 */
+    justify-content: flex-start; 
+    /* text-align: center; /* .card-content 내부에서 개별적으로 처리 */
+}
+
+.card-back .card-content { 
+    width: 100%;
+    height: 100%; /* 부모(.card-back)의 패딩 영역 내에서 꽉 차도록 */
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    background: #fff;
+    align-items: center; /* 내부 텍스트 블록들 수평 중앙 정렬 */
+    text-align: center; /* 내부 텍스트 기본 중앙 정렬 */
+    overflow: hidden; /* .card-description-value에서 스크롤 처리하므로 여기선 hidden */
+    /* 스크롤바 스타일은 .card-description-value로 이동 */
+}
+
+/* WebKit 브라우저용 스크롤바 스타일 - .card-description-value로 이동 */
+
+.card-back h2 {
+    font-family: '지백', serif;
+    color: #000000; 
+    font-size: 1.4rem; 
+    margin: 0 0 0.8rem 0; /* 하단 마진 기존보다 약간 줄임 */
+    font-weight: normal;
+    flex-shrink: 0; 
+}
+
+.card-back p { 
+    margin-bottom: 0.5rem; /* p 태그간 마진 약간 줄임 */
+    word-break: break-word; 
+    flex-shrink: 0; /* 카테고리, URL은 줄어들지 않도록 */
+}
+
+.card-category-value,
+.card-url-value a {
+    font-family: 'SuisseIntlMono', monospace; 
+    font-size: 0.9rem; 
+    line-height: 1.4; 
+    color: #333;
+}
+
+.card-url-value a {
+    color: #0056b3; 
+    text-decoration: underline;
+}
+
+.card-url-value a:hover {
+    color: #003d80;
+}
+
+.card-description-value {
+    margin-top: 10px; /* 설명과 URL 사이 간격 */
+    font-size: 0.9em;
+    line-height: 1.4;
+    max-height: 120px; /* 설명이 너무 길 경우 스크롤 생성 */
+    overflow-y: auto;
+    color: #555; /* 설명 텍스트 색상 */
+}
+
+.card-back .card-label {
+    font-family: 'SuisseIntlMono', monospace;
+    font-size: 0.85rem; 
+    color: #000000; /* 레이블 색상 명확히 지정 */
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.card-back .card-value {
+    font-family: '지백', sans-serif;
+    font-size: 0.95rem; 
+    color: #111111; /* 값 색상 명확히 지정 */
+    word-break: break-all;
+}
+
+.card-back a.card-value {
+    color: #0056b3; /* 링크 색상 명확히 지정 */
+    text-decoration: underline;
 }
 
 .card-label {
-    font-family: 'Suisse Int\'l Mono', monospace;
+    font-family: 'SuisseIntlMono', monospace;
     font-size: 0.95rem;
     color: #222;
     font-weight: bold;
@@ -228,7 +355,7 @@ h1 {
 }
 
 .card-number {
-    font-family: 'Suisse Int\'l Mono', monospace;
+    font-family: 'SuisseIntlMono', monospace;
     font-size: 1.1rem;
     color: #888;
     text-align: right;
@@ -314,23 +441,33 @@ h1 {
 
 /* --- COVER 표지 레이아웃 정교화 --- */
 .cover {
-    width: 85vh;
-    height: 85vh;
+    width: 80vw;
+    height: 80vw;
     margin: 0 auto;
-    position: relative;
-    display: grid;
-    grid-template-rows: 22% 38% 1fr 22%;
-    padding: 3vh 3vh 2vh 3vh;
+    padding: 2vw;
+    margin-bottom: 8vw;
     box-sizing: border-box;
-    background-color: #fff;
+    /* background-color: #fff; */
+}
+
+/* .cover 내부의 모든 span 태그에 기본 폰트 크기 적용 */
+.cover span {
+    font-size: 1.8vw; /* SVG를 위해 폰트 크기 약간 줄임 (기존 2.2vw) */
+    line-height: 1.2; 
+    font-family: 'SuisseIntlMono', sans-serif; 
+}
+
+/* .cover 내 한글 폰트는 별도 지정 */
+.cover .korean {
+    font-family: '지백', sans-serif;
+    /* font-size는 .cover span에서 상속받거나, 필요시 여기서 재정의 */
 }
 
 .cover-block {
     width: 100%;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 0.5vh;
+    flex-direction: column;/* 각 블록을 그리드 행의 시작점에 배치 */  /* 내부 요소들이 너비를 100% 사용하도록 */
+    text-align: left;          /* 기본 텍스트 정렬을 왼쪽으로 (필요시 내부에서 재정의) */
 }
 
 /* 상단 블록: 좌측 정렬, 자간 넓게 */
@@ -339,16 +476,16 @@ h1 {
     text-align: left;
     letter-spacing: 0.01em;
     margin-bottom: 0;
+    justify-content: flex-start; /* 상단 블록들은 위쪽에 붙도록 */
 }
 .cover-block.top .mono {
-    font-size: 5.2vh;
-    letter-spacing: 0.04em;
-    font-weight: 400;
+    /* font-size는 .cover span에서 상속 */
+    /* line-height는 .cover span에서 상속 또는 필요시 여기서 재정의 */
 }
 .cover-block.top .clock {
-    font-size: 5.2vh;
-    letter-spacing: -1em;
-    word-spacing: -1em;
+    /* font-size는 .cover span에서 상속 */
+    letter-spacing: -0.05em; /* 기존의 극단적인 letter-spacing 값(-1em) 대신 좀 더 일반적인 음수 값으로 조정 */
+    word-spacing: -0.05em;  /* 기존의 극단적인 word-spacing 값(-1em) 대신 좀 더 일반적인 음수 값으로 조정 */
     font-weight: 400;
 }
 
@@ -359,10 +496,9 @@ h1 {
     gap: 0.2vh;
 }
 .cover-block.middle .mono {
-    font-size: 5.2vh;
-    letter-spacing: 0.01em;
-    font-weight: 400;
-    line-height: 1.05;
+    /* font-size는 .cover span에서 상속 */
+    font-weight: bold; /* 유지 */
+    /* line-height는 .cover span에서 상속 */
 }
 
 /* 하단 블록: 첫 줄 한글 중앙, 나머지 좌측 */
@@ -372,25 +508,30 @@ h1 {
 .cover-block.bottom .korean {
     text-align: center;
     width: 100%;
-    font-size: 5.2vh;
+    /* font-size는 .cover span과 .cover .korean에서 처리 */
     font-weight: 400;
     letter-spacing: 0.01em;
     margin-bottom: 0.5vh;
 }
 .cover-block.bottom .mono {
-    text-align: left;
-    font-size: 5.2vh;
-    font-weight: 400;
-    letter-spacing: 0.01em;
+    /* font-size는 .cover span에서 상속 */
+    font-weight: 100; /* 유지 */
+    /* line-height는 .cover span에서 상속 */
 }
 .cover-block.bottom .number {
-    font-size: 5.2vh;
-    font-family: 'Suisse Int\'l Mono', monospace;
+    /* font-size는 .cover span에서 상속 */
+    /* font-family는 .cover span에서 상속 (SuisseIntlMono) */
     font-weight: 400;
     letter-spacing: 0.01em;
-    margin-right: 1vw;
 }
 
+.svg-img {
+    width: 100%;
+    height: auto;
+    padding: 4rem;
+    object-fit: contain;
+    text-align: center;
+}
 /* 숫자 0이 왼쪽에 붙도록 */
 .cover-block.bottom {
     flex-direction: row;
@@ -410,38 +551,45 @@ h1 {
         width: 97vw;
         height: 97vw;
         padding: 2vw;
-        grid-template-rows: 22% 38% 1fr 22%;
+        grid-template-rows: auto auto auto 1fr auto; 
     }
-    .cover-block.top .mono,
-    .cover-block.top .clock,
-    .cover-block.middle .mono,
-    .cover-block.bottom .korean,
-    .cover-block.bottom .mono,
-    .cover-block.bottom .number {
-        font-size: 4vw;
+
+    .cover span {
+        font-size: 3vw; 
+    }
+
+    .cover-block.svg-container img {
+        max-width: 75%; 
+        max-height: 75%; 
     }
 }
-
+#small-center {
+    text-align: center;
+    font-size: 1.5vw;
+}
+#big-center {
+    text-align: center;
+    font-size: 3vw;
+}
 /* 텍스트 스타일링 */
 .mono {
-    font-family: 'Suisse Int\'l Mono', monospace;
-    font-size: 5vh;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-family: 'SuisseIntlMono', sans-serif;
+    /* font-size는 이제 .cover span 등 더 구체적인 선택자에서 처리 */
+    line-height: 1.2;
 }
 
 .korean {
     font-family: '지백', sans-serif;
-    font-size: 5vh;
+    /* font-size는 .cover .korean 또는 .cover span에서 처리 */
     line-height: 1.1;
     letter-spacing: -0.02em;
 }
 
 /* 시간 표시 부분 특별 스타일 */
 .clock {
-    font-size: 5vh;
-    letter-spacing: -.1em;
-    word-spacing: -0.1em;
+    /* font-size는 .cover span에서 상속 */
+    /* letter-spacing 및 word-spacing은 .cover-block.top .clock 에서 개별 조정됨 */
+    /* font-size: 4vw; */ /* 사용자가 수정한 부분. .cover span에서 상속받도록 제거 */
 }
 span {
     display: inline-block;
@@ -457,28 +605,22 @@ span {
 /* 숫자 표시 부분 */
 .number {
     display: inline-block;
-    width: 3.5em;  /* 숫자 3자리 + 여백 */
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-    .cover {
-        width: 95vw;
-        height: 95vw;
-        padding: 4vw;
-    }
+/* SVG 컨테이너 스타일 추가 */
+.cover-block.svg-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%; /* 부모 그리드 행의 높이를 다 사용 */
+    grid-row: 4 / 5; /* 명시적으로 4번째 그리드 행에 위치하도록 설정 */
+}
 
-    .mono, .korean, .clock {
-        font-size: 4vw;
-    }
-
-    .cover-block:first-child {
-        margin-bottom: 10vw;
-    }
-
-    .cover-block:nth-child(2) {
-        margin-bottom: 10vw;
-    }
+.cover-block.svg-container img {
+    max-width: 70%; /* SVG 이미지 크기 조절 */
+    max-height: 70%; /* SVG 이미지 크기 조절 */
+    object-fit: contain;
 }
 
 .project-description-columns {
@@ -490,7 +632,7 @@ span {
     padding: 4rem 2rem;
 }
 .project-description.en {
-    font-family: 'Suisse Int\'l Mono', monospace;
+    font-family: 'SuisseIntlMono', monospace;
     font-size: 1rem;
     line-height: 1.4;
     color:black;
@@ -503,6 +645,9 @@ span {
     font-size: 1rem;
     line-height: 1.8;
     color: black;
+    background: none;
+    box-shadow: none;
+    padding: 0;
 }
 @media (max-width: 900px) {
     .project-description-columns {
@@ -513,4 +658,130 @@ span {
     .project-description.en, .project-description.ko {
         font-size: 0.95rem;
     }
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.interactive-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #333;
+  color: #fff;
+  text-decoration: none;
+  font-family: 'SuisseIntlMono-Regular', monospace;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.interactive-button:hover {
+  background-color: #555;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 반응형 그리드에서 아이템이 하나만 남을 경우를 대비한 스타일 (선택적) */
+@media (min-width: calc(320px * 2 + 3rem * 3)) { /* 대략 2개 카드 + 갭 너비 이상일 때 */
+    #content.single-item-row .card {
+        margin-left: 0; /* 단일 아이템이 중앙이 아닌 왼쪽에 붙도록 */
+    }
+}
+
+/* 인터랙티브 컨테이너 스타일 */
+#interactive-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: transparent;
+}
+
+#p5Canvas {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    /* background-color: white; */
+}
+
+.header-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+}
+
+.header-bar h1 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.header-bar h1 a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.tooltip {
+    position: absolute;
+    background: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 3;
+}
+
+.circle-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #000;
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.controls {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    gap: 10px;
+}
+
+.shake-button {
+    padding: 10px 15px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    border-radius: 300px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'SuisseIntlMono-Regular', monospace;
+}
+
+.shake-button:hover {
+    background-color: #555;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.shake-button:active {
+    transform: translateY(1px);
 } 

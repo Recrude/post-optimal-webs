@@ -70,66 +70,39 @@ async function fetchData() {
             element.textContent = formattedNumber + ' ';
         });
 
-        return rows;
+        shuffledData = shuffleArray([...rows.slice(1)]); // 섞인 데이터를 전역 변수에 저장
+        return rows; // 원본 데이터 (헤더 포함) 반환
     } catch (error) {
         console.error('데이터를 가져오는 중 오류가 발생했습니다:', error);
         return null;
     }
 }
 
-// 웹사이트의 썸네일 이미지를 가져오는 함수 (타임아웃 포함)
-async function fetchThumbnail(url, timeout = 5000) {
+// 웹사이트의 썸네일 이미지를 가져오는 함수 (Screenshoter.com API + CORS 프록시 사용)
+async function fetchThumbnail(url) {
     // 캐시된 썸네일이 있으면 반환
     if (thumbnailCache.has(url)) {
         return thumbnailCache.get(url);
     }
 
     try {
-        // 타임아웃 Promise
-        const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Timeout')), timeout);
-        });
+        const screenshotApiUrl = `https://screenshoter.com/?uri=${encodeURIComponent(url)}&viewport=1280x1024&type=cropped&size=large`;
+        // CORS 문제를 우회하기 위해 프록시 사용
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(screenshotApiUrl)}`;
+        
+        const response = await fetch(proxyUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch screenshot for ${url} via proxy`);
+        }
+        
+        const imageBlob = await response.blob();
+        const objectURL = URL.createObjectURL(imageBlob);
 
-        // 썸네일 가져오기 Promise
-        const fetchPromise = (async () => {
-            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-            const response = await fetch(proxyUrl);
-            const data = await response.json();
-            
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data.contents, 'text/html');
-            
-            let thumbnailUrl = null;
+        thumbnailCache.set(url, objectURL);
+        return objectURL;
 
-            // Open Graph 이미지
-            const ogImage = doc.querySelector('meta[property="og:image"]');
-            if (ogImage?.content) thumbnailUrl = ogImage.content;
-            
-            // Twitter 이미지
-            if (!thumbnailUrl) {
-                const twitterImage = doc.querySelector('meta[name="twitter:image"]');
-                if (twitterImage?.content) thumbnailUrl = twitterImage.content;
-            }
-            
-            // 첫 번째 이미지
-            if (!thumbnailUrl) {
-                const firstImage = doc.querySelector('img');
-                if (firstImage?.src) thumbnailUrl = firstImage.src;
-            }
-
-            // 기본 이미지
-            thumbnailUrl = thumbnailUrl || getRandomFallbackImage();
-            
-            // 캐시에 저장
-            thumbnailCache.set(url, thumbnailUrl);
-            
-            return thumbnailUrl;
-        })();
-
-        // 타임아웃과 경쟁
-        return await Promise.race([fetchPromise, timeoutPromise]);
     } catch (error) {
-        console.error('썸네일을 가져오는 중 오류가 발생했습니다:', error);
+        console.error('스크린샷을 가져오는 중 오류가 발생했습니다:', error);
         const fallbackUrl = getRandomFallbackImage();
         thumbnailCache.set(url, fallbackUrl);
         return fallbackUrl;
@@ -137,68 +110,199 @@ async function fetchThumbnail(url, timeout = 5000) {
 }
 
 // 데이터를 화면에 표시하는 함수
-async function displayData(data) {
-    const contentElement = document.getElementById('content');
-    contentElement.innerHTML = '';
+async function displayData() {
+    const sceneElement = document.getElementById('scene');
+    if (!sceneElement) return;
+    sceneElement.innerHTML = ''; // Clear existing content
 
-    const header = data[0];
-    const rows = data.slice(1);
-    const shuffledRows = shuffleArray([...rows]);
+    // 월드 크기 정의 (확대)
+    const worldWidth = 10000;
+    const worldHeight = 10000;
+    sceneElement.style.width = `${worldWidth}px`;
+    sceneElement.style.height = `${worldHeight}px`;
 
-    // 모든 카드를 먼저 생성하고 썸네일은 병렬로 로드
-    const cards = shuffledRows.map(row => {
-        if (row.length >= 4) {
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            const category = row[0]?.trim() || '분류 없음';
-            const title = row[1]?.trim() || '제목 없음';
-            const url = row[2]?.trim() || '#';
-            const description = row[3]?.trim() || '설명 없음';
-            
-            // 썸네일 없이 카드 먼저 생성 (로딩 중 이미지도 귀여운 고양이로)
-            card.innerHTML = `
-                <div class="card-image">
-                    <img src="https://http.cat/100" alt="${title}">
-                </div>
-                <div class="card-content">
-                    <h2>${title}</h2>
-                    <p><strong>분류:</strong> ${category}</p>
-                    <p><strong>URL:</strong> <a href="${url}" target="_blank">${url}</a></p>
-                    <p><strong>설명:</strong> ${description}</p>
-                </div>
-            `;
-            
-            contentElement.appendChild(card);
-            
-            // 썸네일 로딩 Promise 반환
-            return {
-                card,
-                thumbnailPromise: fetchThumbnail(url).then(thumbnailUrl => {
-                    const img = card.querySelector('img');
-                    if (img) {
-                        img.src = thumbnailUrl;
-                    }
-                })
+    const rows = shuffledData; // 전역 변수에 저장된 섞인 데이터 사용 (헤더 없음)
+
+    // 카테고리별 색상 매핑
+    const categoryColors = {
+        '사회적 비판과 거버넌스': 'rgb(255, 238, 173)', // 노랑
+        '기술 윤리와 미래 시나리오': 'rgb(255, 179, 179)', // 빨강
+        '디지털 정체성과 문화': 'rgb(179, 226, 179)',   // 초록
+        '환경·경제 시스템 탐구': 'rgb(179, 204, 226)', // 파랑
+        '실험적 인터페이스와 데이터 경험': 'rgb(255, 204, 179)', // 주황
+        '디지털 유산과 역사성': 'rgb(204, 226, 179)',   // 연두
+        '분류 없음': 'rgb(220, 220, 220)' // 회색 (기타)
+    };
+
+    let allCardThumbnailPromises = [];
+    const cardPositions = [];
+    const cardSize = 240; // .card의 크기와 동일 (축소)
+    const minDistance = cardSize * 2.0; // 카드 간 최소 이격 거리 (증가)
+
+    rows.forEach(row => {
+        if (row.length < 4) return;
+        
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        // 겹치지 않는 위치 찾기
+        let position;
+        let attempts = 0;
+        do {
+            position = {
+                x: Math.random() * (worldWidth - cardSize),
+                y: Math.random() * (worldHeight - cardSize)
             };
-        }
-        return null;
-    }).filter(Boolean);
+            attempts++;
+        } while (
+            cardPositions.some(p => Math.sqrt(Math.pow(p.x - position.x, 2) + Math.pow(p.y - position.y, 2)) < minDistance) &&
+            attempts < 100
+        );
+        
+        cardPositions.push(position);
+        card.style.left = `${position.x}px`;
+        card.style.top = `${position.y}px`;
+
+        const category = row[0]?.trim() || '분류 없음';
+        const title = row[1]?.trim() || '제목 없음';
+        const url = row[2]?.trim() || '#';
+        const description = row[3]?.trim() || '설명 없음';
+
+        const cardInner = document.createElement('div');
+        cardInner.className = 'card-inner';
+
+        // 카드 앞면 (이미지 + 카테고리 배경색)
+        const cardFront = document.createElement('div');
+        cardFront.className = 'card-front';
+        // 카테고리별 배경색 적용
+        cardFront.style.backgroundColor = categoryColors[category] || categoryColors['분류 없음'];
+        cardFront.innerHTML = `
+            <div class="card-image">
+                <img src="https://http.cat/100" alt="${title}">
+            </div>
+        `;
+
+        // 카드 뒷면 (콘텐츠)
+        const cardBack = document.createElement('div');
+        cardBack.className = 'card-back';
+        
+        // 내용 수정: URL은 "WEBSITE LINK" 텍스트로 대체, 설명은 전체 표시
+        cardBack.innerHTML = `
+            <div class="card-content">
+                <h2>${title}</h2>
+                <p class="card-category-value">${category}</p>
+                <p class="card-url-value"><a href="${url}" target="_blank" rel="noopener noreferrer">WEBSITE LINK</a></p>
+                <p class="card-description-value">${description}</p> 
+            </div>
+        `;
+
+        cardInner.appendChild(cardFront);
+        cardInner.appendChild(cardBack);
+        card.appendChild(cardInner);
+        sceneElement.appendChild(card);
+        
+        allCardThumbnailPromises.push(
+            fetchThumbnail(url).then(thumbnailUrl => {
+                const img = card.querySelector('.card-front .card-image img');
+                if (img) {
+                    img.src = thumbnailUrl;
+                }
+            })
+        );
+    });
 
     // 모든 썸네일을 병렬로 로드
-    await Promise.allSettled(cards.map(card => card.thumbnailPromise));
+    await Promise.allSettled(allCardThumbnailPromises);
+
+    // Panzoom 초기화
+    const panzoom = Panzoom(sceneElement, {
+        canvas: true,
+        contain: 'outside',
+        minScale: 0.3,
+        maxScale: 1.5
+    });
+
+    const parent = sceneElement.parentElement;
+    parent.addEventListener('wheel', panzoom.zoomWithWheel);
+
+    // Grab 커서 상태 변경
+    parent.addEventListener('mousedown', () => parent.style.cursor = 'grabbing');
+    parent.addEventListener('mouseup', () => parent.style.cursor = 'grab');
+    parent.addEventListener('mouseleave', () => parent.style.cursor = 'grab');
 }
 
-// 페이지 로드 시 데이터 가져오기
+// 페이지 로드 시 데이터 가져오기 및 원형 텍스트 적용
 async function initialize() {
     const data = await fetchData();
     if (data) {
-        await displayData(data);
+        await displayData();
+        // 인터랙티브 뷰 시작
+        if (typeof startInteractiveView === 'function') {
+            startInteractiveView(shuffledData);
+        }
+    }
+    // 카드 표시 후 원형 텍스트 적용
+    // displayData가 DOM을 변경하므로, 그 이후에 호출하는 것이 안전
+    try {
+        applyCircularText('main-circular-text', 60, 12, -90);
+    } catch (e) {
+        console.error("Error applying circular text:", e);
     }
 }
 
-// 5분마다 데이터 업데이트
-setInterval(initialize, 5 * 60 * 1000);
+// 5분마다 데이터 업데이트 (원형 텍스트는 초기 로드 시에만 적용)
+setInterval(async () => {
+    const data = await fetchData();
+    if (data) {
+        await displayData();
+    }
+}, 5 * 60 * 1000);
 
 // 초기 로드
-initialize(); 
+initialize();
+
+function applyCircularText(elementId, radius, letterSpacingDegrees, startAngleOffsetDegrees) {
+    const element = document.getElementById(elementId);
+    if (!element) {
+        console.error("Element with ID " + elementId + " not found for circular text.");
+        return;
+    }
+
+    const text = element.innerText;
+    if (!text || text.trim() === '') {
+        // console.warn("Text content is empty for element ID: " + elementId);
+        // return; // 텍스트가 없으면 실행 중단 (필요시 주석 해제)
+    }
+    element.innerHTML = ''; // 기존 텍스트 지우기
+    element.style.position = 'relative'; 
+    element.style.display = 'inline-block'; 
+    // 크기 설정은 요소의 내용과 폰트 크기에 따라 유동적일 수 있으므로, 
+    // CSS에서 .cover-block .mono 에 이미 스타일이 있다면 여기서 고정 크기 설정은 주의
+    // element.style.width = (radius * 2.5) + 'px'; 
+    // element.style.height = (radius * 2.5) + 'px'; 
+    element.style.textAlign = 'center';
+
+    const characters = text.split('');
+    const totalChars = characters.length;
+    const angleStep = letterSpacingDegrees; 
+
+    characters.forEach((char, index) => {
+        const charSpan = document.createElement('span');
+        charSpan.innerText = char;
+        
+        const angleDegrees = startAngleOffsetDegrees + (index * angleStep);
+        const angleRadians = angleDegrees * (Math.PI / 180);
+
+        const x = radius * Math.cos(angleRadians);
+        const y = radius * Math.sin(angleRadians);
+
+        charSpan.style.position = 'absolute';
+        charSpan.style.left = '50%'; 
+        charSpan.style.top = '50%';  
+        charSpan.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${angleDegrees + 90}deg)`; 
+        
+        element.appendChild(charSpan);
+    });
+}
+
+let shuffledData = []; // interactive.js에 전달할 데이터를 저장할 변수 
