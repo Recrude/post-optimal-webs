@@ -4,12 +4,15 @@
   "description": "Google Sheets based website",
   "main": "script.js",
   "scripts": {
-    "start": "live-server"
+    "start": "serve"
   },
   "dependencies": {
-    "google-spreadsheet": "^4.1.1"
+    "google-spreadsheet": "^4.1.1",
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "live-server": "^1.2.2"
-  }
-} 
+  },
+  "author": "",
+  "license": "ISC"
+}

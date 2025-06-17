@@ -17,7 +17,10 @@
                           <span class="mono leftalign clock" id="small-center"></span>
                         </div>
                         <div class="cover-block svg-img">
-                            <div id="interactive-title"><img src="images/title.svg" alt="Post-Optimal Webs Title SVG"></div>
+                            <div id="header-svg-container" class="svg-container">
+                                <img src="images/circle_svg/circle_svg1-1.svg" alt="Header SVG 1" class="stacked-svg" id="rotating-svg-header">
+                                <img src="images/circle_svg/circle_svg1-2.svg" alt="Header SVG 2" class="stacked-svg">
+                            </div>
                         </div>
                         <div class="cover-block">
                             <div class="korean leftalign" id="small-center"><span class="mono number leftalign" id="small-center"></span>개의 탈-최적화된 웹 아카이브</span><br>
@@ -51,6 +54,14 @@
                     <!-- 데이터가 여기에 동적으로 로드됩니다 -->
                 </div>
             </main>
+
+            <section id="generative-iframes">
+                <div class="iframe-viewport">
+                    <div class="iframe-container">
+                        <!-- IFRAME이 여기에 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -64,6 +75,31 @@
         
     </div>
     
+    <section id="submission-section">
+        <div class="container">
+            <h2>웹사이트 제보하기</h2>
+            <p>사변적 웹 아카이브에 추가하고 싶은 웹사이트가 있다면 제보해주세요.</p>
+            <form id="submission-form">
+                <select name="category" required>
+                    <option value="" disabled selected>분류를 선택하세요</option>
+                    <option value="기술 윤리와 미래 시나리오">기술 윤리와 미래 시나리오</option>
+                    <option value="디지털 유산과 역사성">디지털 유산과 역사성</option>
+                    <option value="디지털 정체성과 문화">디지털 정체성과 문화</option>
+                    <option value="사회적 비판과 거버넌스">사회적 비판과 거버넌스</option>
+                    <option value="실험적 인터페이스와 데이터 경험">실험적 인터페이스와 데이터 경험</option>
+                    <option value="환경·경제 시스템 탐구">환경·경제 시스템 탐구</option>
+                    <option value="기타">기타</option>
+                </select>
+                <input type="text" name="title" placeholder="웹사이트 제목" required>
+                <input type="url" name="url" placeholder="웹사이트 URL (https://...)" required>
+                <textarea name="description" placeholder="웹사이트에 대한 간단한 설명" rows="4" required></textarea>
+                <input type="text" name="submitter" placeholder="제보자 이름 (선택사항)">
+                <button type="submit">제출하기</button>
+            </form>
+            <div id="form-response"></div>
+        </div>
+    </section>
+
     <div class="controls">
         <button class="shake-button" id="shake-button">🪇</button>
     </div>
@@ -76,5 +112,13 @@
     <script src="script.js"></script>
     <script src="interactive.js"></script>
     <!-- <script src="multilingual.js"></script> -->
+
+    <footer>
+        <div id="footer-svg-container" class="svg-container">
+            <img src="images/circle_svg/circle_svg2-1.svg" alt="Footer SVG 1" class="stacked-svg" id="rotating-svg-footer-slow">
+            <img src="images/circle_svg/circle_svg2-2.svg" alt="Footer SVG 2" class="stacked-svg" id="rotating-svg-footer-fast">
+            <img src="images/circle_svg/circle_svg2-3.svg" alt="Footer SVG 3" class="stacked-svg">
+        </div>
+    </footer>
 </body>
 </html> 

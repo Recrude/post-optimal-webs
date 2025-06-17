@@ -231,35 +231,187 @@ async function displayData() {
     parent.addEventListener('mouseleave', () => parent.style.cursor = 'grab');
 }
 
+// 생성형 Iframe을 만드는 함수 (유기적 애니메이션으로 변경)
+function initOrganicIframeAnimation() {
+    const viewport = document.querySelector('.iframe-viewport');
+    const container = document.querySelector('.iframe-container');
+    if (!container || !viewport) return;
+
+    // p5.js 인스턴스가 로드되었는지 확인
+    if (typeof interactiveView === 'undefined' || !interactiveView.p5) {
+        console.warn("p5.js instance not ready for iframe animation. Retrying in 100ms.");
+        setTimeout(initOrganicIframeAnimation, 100);
+        return;
+    }
+
+    const p5 = interactiveView.p5;
+    const websites = shuffledData.slice(0, 12); // 개수 조정 (12개)
+    if (websites.length === 0) return;
+
+    container.innerHTML = ''; // 기존 콘텐츠 초기화
+
+    const particles = [];
+    const viewportWidth = viewport.offsetWidth;
+    const viewportHeight = viewport.offsetHeight;
+
+    class IframeParticle {
+        constructor(url, index) {
+            this.url = url;
+            this.width = p5.random(150, 350);
+            this.height = this.width * 0.75;
+            this.x = p5.random(viewportWidth);
+            this.y = p5.random(viewportHeight);
+            
+            this.z = p5.random(0.5, 1.5); // 깊이감 (크기, 속도 조절)
+            this.element = this.createDOMElement();
+
+            // 노이즈 오프셋: 각 파티클이 다르게 움직이도록
+            this.noiseOffsetX = p5.random(1000);
+            this.noiseOffsetY = p5.random(1000);
+            this.noiseOffsetZ = p5.random(1000); // 크기 변경용
+        }
+
+        createDOMElement() {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'dynamic-iframe-wrapper';
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = this.url;
+            iframe.scrolling = 'no';
+            iframe.loading = 'lazy';
+            iframe.sandbox = 'allow-scripts allow-same-origin';
+
+            wrapper.appendChild(iframe);
+            container.appendChild(wrapper);
+            return wrapper;
+        }
+
+        update() {
+            const time = p5.millis() * 0.0001;
+            
+            // Perlin 노이즈를 사용하여 속도 결정
+            const angle = p5.noise(this.noiseOffsetX + time, this.noiseOffsetY + time) * p5.TWO_PI * 4;
+            const speed = p5.map(this.z, 0.5, 1.5, 0.1, 0.5);
+            
+            this.x += Math.cos(angle) * speed;
+            this.y += Math.sin(angle) * speed;
+
+            // 크기를 노이즈로 부드럽게 변경
+            const sizeNoise = p5.noise(this.noiseOffsetZ + time);
+            this.currentScale = p5.map(sizeNoise, 0.2, 0.8, 0.8, 1.2) * this.z;
+            this.currentWidth = this.width * this.currentScale;
+            this.currentHeight = this.height * this.currentScale;
+
+            // 화면 경계 처리 (wrap around)
+            if (this.x > viewportWidth + this.currentWidth / 2) this.x = -this.currentWidth / 2;
+            if (this.x < -this.currentWidth / 2) this.x = viewportWidth + this.currentWidth / 2;
+            if (this.y > viewportHeight + this.currentHeight / 2) this.y = -this.currentHeight / 2;
+            if (this.y < -this.currentHeight / 2) this.y = viewportHeight + this.currentHeight / 2;
+        }
+
+        render() {
+            this.element.style.width = `${this.currentWidth}px`;
+            this.element.style.height = `${this.currentHeight}px`;
+            this.element.style.zIndex = Math.floor(this.z * 10);
+            this.element.style.transform = `translate(${this.x - this.currentWidth / 2}px, ${this.y - this.currentHeight / 2}px)`;
+        }
+    }
+
+    websites.forEach((site, index) => {
+        const url = site[2]?.trim();
+        if (url && url !== '#') {
+            particles.push(new IframeParticle(url, index));
+        }
+    });
+
+    function animate() {
+        p5.background(0, 5); // 희미한 잔상 효과
+        
+        particles.forEach(p => {
+            p.update();
+            p.render();
+        });
+        
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+
 // 페이지 로드 시 데이터 가져오기 및 원형 텍스트 적용
-async function initialize() {
-    const data = await fetchData();
-    if (data) {
+document.addEventListener('DOMContentLoaded', () => {
+    async function initialize() {
+        // 초기 데이터 로드
+        await fetchData();
+    
+        // 데이터 표시 및 panzoom 초기화
         await displayData();
+        
         // 인터랙티브 뷰 시작
         if (typeof startInteractiveView === 'function') {
             startInteractiveView(shuffledData);
         }
-    }
-    // 카드 표시 후 원형 텍스트 적용
-    // displayData가 DOM을 변경하므로, 그 이후에 호출하는 것이 안전
-    try {
-        applyCircularText('main-circular-text', 60, 12, -90);
-    } catch (e) {
-        console.error("Error applying circular text:", e);
-    }
-}
 
-// 5분마다 데이터 업데이트 (원형 텍스트는 초기 로드 시에만 적용)
-setInterval(async () => {
-    const data = await fetchData();
-    if (data) {
-        await displayData();
+        // 생성형 Iframe 애니메이션 초기화
+        // initOrganicIframeAnimation(); // 이 함수는 현재 사용되지 않는 것으로 보입니다.
     }
-}, 5 * 60 * 1000);
 
-// 초기 로드
-initialize();
+    // 초기화 함수 호출
+    initialize();
+
+    // 제보 폼 관련 로직
+    const submissionSection = document.getElementById('submission-section');
+    if (submissionSection) {
+        let formVisible = false;
+
+        const showSubmissionForm = () => {
+            if (formVisible) return;
+            const buffer = 200; 
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - buffer) {
+                submissionSection.classList.add('visible');
+                formVisible = true;
+                window.removeEventListener('scroll', showSubmissionForm);
+            }
+        };
+
+        window.addEventListener('scroll', showSubmissionForm);
+        showSubmissionForm(); // 초기 로드 시에도 체크
+
+        const form = document.getElementById('submission-form');
+        const formResponseEl = document.getElementById('form-response');
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        const appsScriptURL = 'https://script.google.com/macros/s/AKfycbwLe2TlpU_cjFTF0S5ACFjaIWx-0OZobCq_V6Bsd-qEBxvBulUjQRDURkO_oVOT3jd0/exec'; 
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            submitButton.disabled = true;
+            formResponseEl.textContent = '제출하는 중...';
+            formResponseEl.style.color = '#aaa';
+
+            fetch(appsScriptURL, { method: 'POST', body: new FormData(form) })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === 'success') {
+                        form.reset();
+                        formResponseEl.textContent = '제보해주셔서 감사합니다!';
+                        formResponseEl.style.color = '#4CAF50';
+                    } else {
+                        throw new Error(data.error || '알 수 없는 오류가 발생했습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error!', error);
+                    formResponseEl.textContent = `오류가 발생했습니다: ${error.message}`;
+                    formResponseEl.style.color = '#F44336';
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                });
+        });
+    }
+});
 
 function applyCircularText(elementId, radius, letterSpacingDegrees, startAngleOffsetDegrees) {
     const element = document.getElementById(elementId);
@@ -306,3 +458,22 @@ function applyCircularText(elementId, radius, letterSpacingDegrees, startAngleOf
 }
 
 let shuffledData = []; // interactive.js에 전달할 데이터를 저장할 변수 
+
+// 흔들기 버튼 이벤트 리스너
+const shakeButton = document.getElementById('shake-button');
+if (shakeButton) {
+    shakeButton.addEventListener('click', () => {
+        // 모든 카드를 선택하여 흔들기 클래스 추가
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.classList.add('shake');
+            // 애니메이션이 끝난 후 클래스 제거
+            card.addEventListener('animationend', () => {
+                card.classList.remove('shake');
+            }, { once: true });
+        });
+
+        // 카드 위치 재배치
+        displayData();
+    });
+} 
